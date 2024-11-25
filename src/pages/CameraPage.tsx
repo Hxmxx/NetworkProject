@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 const CameraPage = () => {
   const navigate = useNavigate();
   const [randomQuote, setRandomQuote] = useState<{text: string}>({ text: '기본 명언' });
-  const [time, setTime] = useState<number>(3); // 5분 = 300초
+  const [time, setTime] = useState<number>(300); // 5분 = 300초
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
