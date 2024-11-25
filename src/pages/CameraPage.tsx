@@ -12,6 +12,8 @@ const CameraPage = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const [recordedChunks, setRecordedChunks] = useState<Blob[]>([]);
+  const [imageUrl, setImageUrl] = useState<string>('');
+  const [wsConnection, setWsConnection] = useState<WebSocket | null>(null);
 
   if (time <= 0) {
       document.querySelector('.timer-set')?.setAttribute('style', 'display: block');
@@ -146,6 +148,25 @@ const CameraPage = () => {
     };
   }, []);
 
+  useEffect(() => {
+    // WebSocket 연결 설정
+    const ws = new WebSocket('ws://your-server-url/camera');
+    setWsConnection(ws);
+    
+    ws.onmessage = (event) => {
+      const imageBlob = new Blob([event.data], { type: 'image/jpeg' });
+      const imageUrl = URL.createObjectURL(imageBlob);
+      setImageUrl(imageUrl);
+    };
+
+    // 컴포넌트 언마운트 시 연결 종료
+    return () => {
+      if (wsConnection) {
+        wsConnection.close();
+      }
+    };
+  }, []);
+
   return (
     <>
       <div className="timer-set">
@@ -163,6 +184,13 @@ const CameraPage = () => {
               playsInline
               muted
             />
+            {imageUrl && (
+              <img 
+                src={imageUrl} 
+                style={{ height: '100vh', width: '100%' }} 
+                alt="Real-time camera feed"
+              />
+            )}
             <div className={`camera-overlay ${isRunning ? 'recording' : ''}`}>
               <span className='camera-overlay-text'>촬영 시작을 눌러주세요</span>
             </div>
